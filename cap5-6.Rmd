@@ -1,5 +1,5 @@
 ---
-title: "MATRICES & ARRAYS"
+title: "TEMA 19"
 author:
 - name: Student One (Gr 405)
 - name: Student Two (Gr 410)
@@ -13,286 +13,460 @@ output:
 knitr::opts_chunk$set(include = TRUE, echo = TRUE)
 ```
 
-## **1. Defining a matrix** 
+## **5. Design grafic pentru reprezentarea retelelor** 
 
-### a) using the **matrix** function 
-
-##### *main arguments*
-* **data** = a vector containing the elements of the matrix; defaults to *NA* 
-* **nrow** = the desired number of rows; defaults to *1* 
-* **ncol** = the desired number of columns; defaults to *1* 
-
-##### *other useful arguments*
-* **byrow** = logical controling the filing direction; defaults to *FALSE*
-* **dimnames** = a 2 component list containing the row names and column names of the matrix; defaults to *NULL*
-
-```{r}
-( A <- matrix(data = c(-3,2,893,0.17), nrow = 2, ncol = 2) )
-# controlling the filling direction with "byrow"
-matrix(data = c(1,2,3,4,5,6), nrow = 2, ncol = 3, byrow = FALSE) # the default = column-wise
-matrix(data = c(1,2,3,4,5,6), nrow = 2, ncol = 3, byrow = TRUE) # the alternative = row-wise
+```{r, include = FALSE}
+library(statnet)
+library(UserNetR)
+library(RColorBrewer)
+data(Bali)
 ```
 
-### b) by **binding** vectors of the same type and equal lengths row-wise...
+### 5.1 Introducere
+Scopul unui design grafic conceput pentru retele este acela de a ilustra eficient informatiile cele mai interesante ale retelei. De aceea, trebuie sa avem grija la fiecare element grafic in parte, si la cum este ilustrat in figura. In cele ce urmeaza, am folosit limbajul R si functiile de plotare din pachetele igraph si statnet pentru a avea control deplin asupra modului cum sunt reprezentate elementele retelei.
+
+
+### 5.2 Elemente de design
+Reprezentarile grafice ale retelelor sunt alcatuite dintr-un numar destul de mare de elemente grafice. Elementele grafice individuale cel mai des utilizate pentru vizualizările de rețea sunt descrise pe scurt în secțiunile care urmează. Acestea vor fi abordate pe rând separat.
+
+### 5.2.1 Culoarea unui nod
+Implicit, un nod are culoarea rosie, daca folosim pachetul statnet. Pentru a alege o alta culoare, trebuie sa specificam optiunea de vertex.col, in gplot.Se specifica numele culorii, insa culoarea poate fi specificata si printr-un tiplet de forma RBG.In exemplul de mai jos se poate observa culoarea mov, aplicata nodurilor, sub forma de triplet RGB.
 
 ```{r}
-rbind(1:3, 4:6) # example of a function whose main argument is dots-dots-dots (...)
-```
-### c) ... or column-wise 
-
-```{r}
-cbind(c(1, 4), c(2, 5), c(3, 6)) # another function whose main argument is dots-dots-dots (...)
-```
-### d) accesing the matrix's **dimensions** 
-
-```{r}
-( mymat <- rbind(c(1, 3, 4), 5:3, c(100, 20, 90), 11:13) )
-dim(mymat) # vector of length 2 containing the no. of rows & the no. of columns in that order
-nrow(mymat) # no. of rows
-ncol(mymat) # no. of columns
-dim(mymat)[2] # alternative for the no. of columns
-```
-
-## **2. Subsetting** 
-    
-### a) **positive** subsetting 
-
-* **an element** 
-
-```{r}
-(A <- matrix( c(0.3, 4.5, 55.3, 91, 0.1, 105.5, -4.2, 8.2, 27.9), nrow = 3, ncol = 3) )
-# single element extraction
-A[3, 2]
-```
-
-* **a column**
-
-```{r}
-# single column extraction
-A[,2]
-```
-
-* **a row**
-
-```{r}
-# single row extraction
-A[1,]
-```
-
-* **other possibilities**
-
-```{r}
-# extracting rows 2 & 3 (in that order)
-A[2:3,]
-# extracting columns 3 & 1 (in that order)
-A[,c(3,1)]
-# extracting the corner elements of the matrix
-A[c(1, 3), c(1,3)]
-```
-
-* **the diagonal**
-
-```{r}
-# extracting the diagonal of a (possibly non-square) matrix
-diag(A)
-diag(rbind(1:3, 4:6))
-```
-
-### b) **negative** subsetting 
-
-```{r}
-# leaving one column out
-A[,-2]
-# mixing negative & positive subsetting
-A[-1,3:2]
-# leaving out row 1 and column 2
-A[-1,-2]
-# omitting more than one column
-A[-1, -c(2, 3)]
-```
-
-### c)  **overwriting / changing** specific elements
-
-```{r}
-( B <- A )
-# overwriting the second row
-B[2,] <- 1:3
-B
-# overwriting specific elements
-B[c(1, 3), 2] <- 900
-B
-# replacing the third column with the third row
-B[,3] <- B[3,]
-B
-# replacing the corner elements of the matrix; recycling behaviour
-B[c(1,3),c(1,3)] <- c(-7,7)
-B
-# ovewriting always takes place column-wise (column by column) 
-B[c(1,3), 2:1] <- c(65,-65,88,-88)
-B
-# replacing the diagonal
-diag(B) <- rep(0, times = 3)
-B
-```
-
-## Answers
-
-```{r}
-# a.
-( A <- matrix(c(4.3, 3.1, 8.2, 8.2, 3.2, 0.9, 1.6, 6.5), nrow = 4, ncol = 2, byrow = T) )
-# b.
-dim(A[-1,])
-# c.
-A[,2] <- sort(A[,2])
-A
-# d.
-matrix(A[-4, -1])
-# e.
-( B <- A[3:4, 1:2] )
-# f.
-A[c(4,1), c(2,1)] <- (-1/2) * diag(B)
-A
-```	
-
-## **3. Matrix operations**
-
-### a) the **transpose** of a matrix 
-
-```{r}
-( A <- rbind(c(2, 5,2 ), c(6, 1, 4)) )
-# transposing once
-t(A)
-# transposing twice (gives back the original matrix)
-t(t(A))
-```
-
-### b) the **identity** matrix 
-
-```{r}
-# notice how the same function "diag" gives different types of outputs
-# depending on the type of the argument
-( A <- diag(3) )
-```
-    
-### c) **scalar multiplication** 
-
-```{r}
-( A <- rbind(c(2, 5, 2), c(6, 1, 4)) )
-a <- 2
-a*A
-```
-
-### d) **addition and substraction** 
-
-```{r}
-( A <- cbind(c(2, 5, 2), c(6, 1, 4)) )
-( B <- cbind(c(-2, 3, 6), c(8.1, 8.2, -9.8)) )
-A - B
-A + B
-```
-
-### e) **matrix multiplication** 
-
-* *remember, A\*B is defined only when* **ncol(A) = nrow(B)**
-
-```{r}
-( A <- rbind(c(2, 5, 2), c(6, 1, 4)) )
-dim(A)
-( B <- cbind(c(3, -1, 1), c(-3, 1, 5)) )
-dim(B)
-# both multiplications are possible: A*B
-A %*% B
-# both multiplications are possible: B*A
-B %*% A
-```
-
-### f) **the inverse** of a matrix
-
-```{r}
-( A <- matrix(c(3, 4, 1, 2), 2, 2) )
-# "solve" gives the inverse of A
-solve(A)
-# checking the correctness of the result
-A %*% solve(A)
-solve(A) %*% A
+data(Bali)
+gplot(Bali,vertex.col=rgb(182,103,238, maxColorValue=255),gmode="graph")
 ```
 
 
-## Answers
+De asemenea, putem specifica si nivelul de transparenta al culorii nodurilor. Acest lucru este util in cazul retelelor voluminoase, unde multe noduri se suprapun si este dificil sa le mai distingem. Functia rgb() are optiunea de a seta transparenta, unde 1 este opac, iar 0 este transparent.
 
 ```{r}
-# a.	
-A <- cbind(c(1, 2, 7), c(2, 4, 6))
-B <- cbind(c(10, 30, 50), c(20, 40, 60))
-2/7 * (A - B)
-
-# b.	   
-A <- matrix(c(1, 2, 7), 3, 1)
-B <- matrix(c(3, 4, 8), 3, 1)
-```
-```{r}
-    # i.  no
-ncol(A) == nrow(B)
-    # ii.  yes
-ncol(t(A)) == nrow(B)
-t(A) %*% B
-    # iii. yes
-ncol(A) == nrow(t(A))
-ncol(t(B)) == nrow(A %*% t(A))
-t(B) %*% (A %*% t(A)) 
-    # iv. no
-ncol(A %*% t(A)) == nrow(t(B))
-    # v. yes  
-solve((B %*% t(B)) + (A %*% t(A)) - 100*diag(3))
-
-# c.	
-A <- diag(c(2, 3, 5, -1))
-solve(A) %*% A - diag(4) 
+ndum <- rgraph(300,tprob=0.025,mode="graph")
+op <- par(mar = c(0,0,2,0),mfrow=c(1,2))
+gplot(ndum,gmode="graph",vertex.cex=2,
+      vertex.col=rgb(204,0,0,maxColorValue=255),
+      edge.col="grey80",edge.lwd=0.5,
+      main="Opac in intregime")
+gplot(ndum,gmode="graph",vertex.cex=2,
+      vertex.col=rgb(204,0,0,alpha=80,
+                     maxColorValue=255),
+      edge.col="grey80",edge.lwd=0.5,
+      main="Partial transparent")
 ```
 
-## **4. Multidimensional arrays**
 
-### a) **definition**
-
-* *an array is the multidimensional analogue of the (2-dimensional) matrix*
+Fiecare nod din exemplele precedente are aceeași culoare. O utilizare mai semnificativă a culorii este de a transmite unui nod sau unei caracteristici de rețea o nuanță unică. Astfel, selecțiile de culoare ale nodurilor pot transmite usor informații caracteristice unei proprietati categoriale de nod.
 
 ```{r}
-# a 3-dimensional array consisting of rows, columns and slices
-( AR <- array(data = 1:24, dim = c(3, 4, 2)) )#
-# a 4-dimensional array consisting of rows, columns, slices and blocks
-( BR <- array(rep(1:24, times = 3), dim = c(3, 4, 2, 3)) )
+rolelab <- get.vertex.attribute(Bali,"role")
+op <- par(mar=c(0,0,0,0))
+plot(Bali,usearrows=FALSE,vertex.cex=1.5,label=rolelab,
+     displaylabels=T,vertex.col="role")
 ```
-    
-### b) **subsetting** an array 
+
+
+In figura de mai sus, fiecare categorie de nod este ilustrata cu o culoare anume, iar categoria este printata alaturi d enoduri, facilitand astfel interpretarea. Folosirea paletei de culori implicite are cateva dezavantaje, printre care amintim: numarul limitat de culori (8 culori) si negru definita drept prima culoare. Din acest punct de vedere, ne vine in ajutor paleta de culori oferita de pachetul RColorBrewer, aceasta fiind mult mai usor de personalizat.
 
 ```{r}
-# extracting all row 2 - slice 2 elements
-AR[2,,2]
-# extracting some specific elements
-AR[2,c(3,1),2]
-# extracting the first row of a 3D array
-AR[1,,]
-# extracting the element from the 2nd row, 1st column, 1st slice and 3rd block
-BR[2,1,1,3]
-# extracting all row 1 - block 1 elements
-BR[1,,,1]
-# extracting slice 2
-BR[,,2,]
+display.brewer.pal(5, "Dark2")
+
 ```
-## Answers
+
+### 5.2.2 Forma unui nod
+
+De asemenea, pachetul statnet ofera optiunea de a ilustra grafic nodurile cu ajutorul mai multor forme. Acest lucru devine practic atunci cand exista un numar redus de noduri in reteaua pe care vrem sa o reprezentam. Tipul formei geometrice dorite este specificat prin intermediul numarului de laturi ale sale.
 
 ```{r}
-# a.	
-( A <- array(dim = c(4,2,6), seq(from = 4.8, to = 0.1, length.out = 48)) )
-# b.	
-( B <- A[c(4,1), 2,] )
-# c.	
-( C <- array(dim = c(2, 2, 2, 3), rep(B[2,], times = 6)) )
-# d.	
-( D <- A[,,-6] )
-# e.	
-D[c(2,4),2,c(1,3,5)]  <- -99
-D
+op <- par(mar=c(0,0,0,0))
+rolecat <- as.factor(get.vertex.attribute(Bali,"role"))
+sidenum <- 3:7
+plot(Bali,usearrows=FALSE,vertex.cex=4,
+displaylabels=F,vertex.sides=sidenum[rolecat])
+```
+
+
+### 5.2.3 Marimea unui nod
+
+Marimea nodurilor unei retele poate fi ajustata cu ajutorul optiunii vertex.cex, disponibila atat la functia plot, cat si la gplot. Nodurile ar trebui sa fie suficient de mari incat sa fie vizibile, insa suficient de mici cat sa nu exista suprapuneri repetate, care sa incurce analiza figurii. Un exemplu cu diverse marimi este disponibil mai jos:
+
+```{r}
+plot(Bali,vertex.cex=0.5,main="Prea mic")
+plot(Bali,vertex.cex=2,main="Potrivit")
+plot(Bali,vertex.cex=6,main="Prea mare")
+
+```
+
+
+Marimea unui nod poate comunica aspecte importante ale retelei, spre exemplu: nivelul de centralitate al nodurilor. Pentru a sugera pozitia nodurilor din retea (aflate la periferie/centrate), ne putem folosi de marimea lor (nodurile din centru sa fie mai mari).
+Mai jos am printat o proprietate a nodurilor din reteaua Bali:
+
+```
+deg <- degree(Bali,gmode="graph")
+deg
+## [1] 9 4 9 15 9 10 3 9 9 5 5 5 5 5 9
+## [16] 6 9
+```
+```{r}
+deg <- degree(Bali,gmode="graph")
+plot(Bali,usearrows=T,vertex.cex=deg,main="In functie de deg")
+plot(Bali,usearrows=FALSE,vertex.cex=log(deg),
+main="In functie de log(deg)")
+```
+
+Se poate observa cum am ajustat dimensiunea nodurilor in functie de proprietatea "deg" (printata mai sus). In figura de mai sus, in partea din stanga, nodurile au fost reprezentate in functie de proprietatea deg, pe cand in dreapta au fost ilustrate dupa log(n), acestea capatand valori mai mici, dar mai apropiate si facand astfel figura mai usor de inteles.
+
+
+Alte exemple de ajustare a dimensiunii nodurilor: folosind proprietatea "cls" (closeness), pe care o multiplicam cu o valoare oarecare (de exemplu 4). Valorile initiale ale acestei proprietati sunt mult prea mici, motiv pentru care nodurile ar fi reprezentate foarte mici. Codul este disponbibil mai jos:
+
+```{r}
+cls <- closeness(Bali,gmode="graph")
+plot(Bali,usearrows=T,vertex.cex=cls,main="In functie de cls")
+plot(Bali,usearrows=FALSE,vertex.cex=4*cls, main="In functie de 4*cls")
+```
+
+Un alt exemplu interesant este dat de proprietatea betweenness, denumita in continuare "bet". In acest caz, valorile difera foarte multe, diferenta dintre nodul cel mai mic si cel mai mare fiind de peste 100. Astfel, o solutie este sa realizam radical din (bet + 1).
+
+```{r}
+bet <- betweenness(Bali,gmode="graph")
+plot(Bali,usearrows=T,vertex.cex=bet, main="In functie de bet")
+plot(Bali,usearrows=FALSE,vertex.cex=sqrt(bet+1), main="In functie de sqrt(bet + 1)")
+```
+
+Uneori nu poate fi foarte usor de intuit in functie de ce proprietate a nodurilor sa facem redimensionarea, sau, mai ales, cum sa prelucram acea proprietate. De aceeea, R vine in ajutor cu o functie **rescale()**, care primeste un vector de caracteristici ale nodurilor si face automat redimensionarea intre o valoare minima "low" si una maxima "high". Mai jos am ilustrat aplicarea functiei rescale peste vectorul de proprietati "deg" (degree).
+
+
+```{r}
+rescale <- function(nchar,low,high) {
+min_d <- min(nchar)
+max_d <- max(nchar)
+rscl <- ((high-low)*(nchar-min_d))/(max_d-min_d)+low
+rscl
+}
+
+plot(Bali,vertex.col=rgb(182,103,238, maxColorValue=255), vertex.cex=rescale(deg,1,6), main="Dimensiuni ajustate cu rescale")
+
+```
+
+
+### 5.2.4 Eticheta unui nod
+
+De multe ori este foarte util sa putem vedea ce reprezinta fiecare nod in parte intr-o retea. Acest lucru este posibil prin afisarea unei etichete asociata fiecarui nod. Optiunea **vertex.names** ne ofera aceasta posibilitate.
+
+De asemenea, este suficient sa folosim doar optiunea de **displaylabels=TRUE**:
+
+```{r}
+plot(Bali,displaylabels=TRUE,label.cex=0.8, pad=0.4,label.col="darkblue")
+```
+
+Un alt exemplu de etichete ar fi cu o proprietate utila, aleasa de noi pentru afisare. Spre exemplu, in cazul setului de date Bali, este mai util sa stim rolul infractorilor, decat numele acestora. De aceea, am preluat in variabila **rolelab** vectorul ce contine rolul fiecarui nod din retea:
+
+```{r}
+rolelab <- get.vertex.attribute(Bali,"role")
+plot(Bali, vertex.col=rgb(182,153,238, maxColorValue=255), usearrows=FALSE,label=rolelab, displaylabels=T,label.col="green")
+```
+
+### 5.2.5 Grosimea unei muchii
+
+Daca reteaua contine informatii legate de ce se afla intre noduri, atunci un mod intuitiv de a transmite acest lucru este prin trasarea mai pronuntata a muchiilor respective, facandu-le mai groase sau mai subtiri (**edge.lwd**). Cateva exemple: puterea/vechimea unei prietenii, cantitatile de bani transmise intre anumite companii, etc.
+
+Un exemplu sugestiv din acest punct de vedere pentru reteaua Bali este dat de nivelul de interactiune dintre membrii retelei (stocat in atributul IC).
+
+```{r}
+IClevel <- Bali %e% "IC"
+plot(Bali,vertex.cex=1.5, edge.lwd=1.5*IClevel)
+```
+
+### 5.2.6 Culoarea unei muchii
+
+Culoarea unei muchii (**edge.col**) ne poate transmite informatii precum categoria sau natura relatiei dintre doua noduri. Spre exemplu, putem ilustra daca o prietenie/interactiune este negativa sau pozitiva. Reteaua Bali nu ofera implicit o astfel de impartire pe categorii, insa pentru a ilustra conceptul, vom considera urmatoarele: muchii albastre - relatii neutre, muchii rosii - relatii negative, muchii verzi - relatii pozitive.
+
+```{r}
+n_edge <- network.edgecount(Bali)
+edge_cat <- sample(1:3,n_edge,replace=T)
+linecol_pal <- c("blue","red","green")
+plot(Bali,vertex.cex=1.5,vertex.col="grey25", edge.col=linecol_pal[edge_cat],edge.lwd=2)
+```
+
+
+### 5.2.7 Tipul de reprezentare al unei muchii
+ Similar culorii unei muchii, tipul de reprezentare al muchiei(**edge.lty**) ne poate sugera natura legaturii dintre doua noduri. Acelasi exemplu cu relatii negative sau pozitive este valid si in cazul acesta. Mai jos se regaseste un exemplu in care muchiile sunt reprezentate fie cu linie punctata, fie cu linie intrerupta, fie cu linie intrerupta cu puncte.
+
+```{r}
+n_edge <- network.edgecount(Bali)
+edge_cat <- sample(1:3,n_edge,replace=T)
+line_pal <- c(2,3,4)
+gplot(Bali,vertex.cex=0.8,gmode="graph", vertex.col="gray50",edge.lwd=1.5, edge.lty=line_pal[edge_cat])
+```
+
+
+Pentru a nu incarca figura se recomanda utilizarea diferitelor tipuri de reprezentare a muchiilor doar in cazul retelelor mici, altfel, se recurge la utilizarea culorilor diferite pentru muchii.
+
+### 5.2.8 Legenda
+
+Chiar si daca ne folosim de diverse elemente grafice, precum cele prezentate mai sus, o legenda poate veni in ajutor, pentru a sintetiza informatiile esentiale. Pachetul statnet nu ofera posibilitatea de a reprezenta legende, insa R dispune de functia **legend()**, care e foarte utila in acest sens.
+
+```{r}
+my_pal <- brewer.pal(5,"Dark2")
+rolecat <- as.factor(get.vertex.attribute(Bali,"role"))
+plot(Bali,vertex.cex=rescale(deg,1,5), vertex.col=my_pal[rolecat])
+legend("bottomleft",legend=c("BM","CT","OA","SB","TL"), col=my_pal,pch=19,pt.cex=1.5,bty="n", title="Terrorist Role")
+```
+
+
+In figura de mai sus am folosit atat culori din paleta "Dark2", cat si dimensiuni diferite pentru ilustrarea nodurilor. Aceste elemente se completeaza perfect cu legenda din coltul stang, unde sunt specificate rolurile asociate fiecarei culori.
+
+## **6. Grafica avansata pentru reprezentarea retelelor** 
+
+Elementele grafice prezentate anterior, desi ajuta la transmiterea eficienta a informatiilor unei retele, nu sunt suficiente pentru anumite nevoi si cerinte analitice. Figurile obtinute cu ajutorul pachetelor statnet si igraph sunt complexe, insa statice. In continuare vom analiza posibilitatea de a realiza diagrame interactive, cu care utilizatorul sa poata interactiona. 
+
+## 6.1 Elemente de design interactiv
+
+
+```{r, include = FALSE}
+library(intergraph)
+library(igraph)
+library(networkD3)
+library(visNetwork)
+library(arcdiagram)
+
+```
+
+Exista cateva pachete in R care faciliteaza realizarea de diagrame interactive, oferindu-i utilizatorului control asupra explorarii retelei.
+
+### 6.1.1 Retele interactive simple in igraph
+
+Pachetul **igraph** ofera functia **tkplot()** care ajuta la trasarea unei retele interactive, in care utilizatorul poate modifica pozitia nodurilor.
+
+Cu ajutorul urmatoarelor linii de cod am generat o fereastra interactiva in care se pot aranja nodurile retelei in ce fel doreste utilizatorul.
+
+```{r}
+iBali <- asIgraph(Bali)
+Coord <- tkplot(iBali, vertex.size=3, vertex.label=V(iBali)$role, vertex.color="darkgreen")
+```
+Dupa personalizarea reprezentarii grafice din interfata interactiva, am salvat coordonatele nodurilor si le-am reprezentat intr- versiune finala, cu ajutorul **functiei plot**:
+
+```{r}
+MCoords <- tkplot.getcoords(Coord)
+plot(iBali, layout=MCoords, vertex.size=5, vertex.label=NA, vertex.color="lightblue")
+```
+
+### 6.1.2 Publicarea unei diagrame interactive in format web
+
+
+Pachetul **networkD3** prezinta un set de functii cu care putem construi diagrame interactive, pe care le putem salva sub forma unor documente HTML. Functia **simpleNetwork()** preia ca parametru lista de muchii, stocata ca dataframe. 
+
+
+```{r}
+src <- c("A","A","B","B","C","E")
+target <- c("B","C","C","D","B","C")
+net_edge <- data.frame(src, target)
+simpleNetwork(net_edge)
+```
+
+Pentru a salva figura sub forma unui document HTML, am folosit comanda:
+```
+net_D3 <- simpleNetwork(net_edge)
+saveNetwork(net_D3,file = 'Net_test1.html', selfcontained=TRUE)
+```
+
+O functie care poate genera reprezentari mai complexe este **forceNetwork()**. Pentru a o putea apela, trebuie sa trimitem parametrii sub forma a doua dataframe-uri: primul va contine lista de muchii, iar al doilea lista de noduri, alaturi de id-urile si proprietatile lor. Numerotarea id-urilor nodurilor incepe de la 0. O singura variabila de categorii este permisa.
+
+
+```{r}
+iBali <- asIgraph(Bali)
+#construim lista de muchii:
+iBali_edge <- get.edgelist(iBali)
+iBali_edge <- iBali_edge - 1
+iBali_edge <- data.frame(iBali_edge)
+
+#construim lista de noduri:
+iBali_nodes <- data.frame(NodeID=as.numeric(V(iBali)-1), Group=V(iBali)$role, Nodesize=(degree(iBali)))
+
+forceNetwork(Links = iBali_edge, Nodes = iBali_nodes, Source = "X1", Target = "X2", NodeID = "NodeID", Nodesize = "Nodesize", radiusCalculation="Math.sqrt(d.nodesize)*3", Group = "Group", opacity = 0.8, legend=TRUE)
+```
+
+
+Pachetul **visNetwork** este, de asemenea, foarte util pentru grafica interactiva. Datele trebuie trimise la fel ca la functia forceNetwork(), sub forma de dataframe-uri. Conventia este ca dataframe-ul de noduri sa contina obligatoriu o coloana "id", dataframe-ul de muchii trebuie sa aiba campurile "from" si "to".
+
+```{r}
+library(visNetwork)
+iBali_edge <- get.edgelist(iBali)
+iBali_edge <- data.frame(from = iBali_edge[,1],
+to = iBali_edge[,2])
+iBali_nodes <- data.frame(id = as.numeric(V(iBali)))
+visNetwork(iBali_nodes, iBali_edge, width = "100%")
+```
+
+Aceste reprezentari interactive se deschid intr-o fereastra in RStudio. Pentru a-l salva intr-un fisier separat, pentru a putea fi refolosit din nou, se poate salva cu ajutorul functiei **saveWidget()**:
+
+```
+net <- visInteraction(net,navigationButtons = TRUE)
+library(htmlwidgets)
+saveWidget(net, "My_interactive_graph.html")
+
+```
+
+### 6.1.3 Statnet web: statnet interactiv
+Cu ajutorul framework-ului shiny, echipa de dezvoltare statnet a creat o versiune web a tool-urilor lor de analiza de retele. Utilizatorul poate crea graph-ul dorit dintr-o interfata primitoare, selectand parametrii si optiuni din elemente de drop-down.
+
+
+### 6.2 Diagrame de retea specializate
+
+```{r, include = FALSE}
+library(devtools)
+library(sna)
+library(ggplot2)
+library(Hmisc)
+install_github("gastonstat/arcdiagram")
+```
+
+Diagramele de retele sunt utile pentru a ilustra proprietati esentiale ale retelei si ale nodurilor. Totusi, sunt disponibile si alte tipuri de diagrame, precum: diagrame cu arcuri, diagrame coarda si heatmap-uri.
+
+
+### 6.2.1 Diagrame cu arcuri
+
+Atunci când modelul legăturilor într-o rețea este mai important decât locația nodurilor, pot fi folosite diagrame cu arc. Pentru acest lucru avem nevoie de libraria **gastonstat/arcdiagram**, de pe github.
+
+Functia **arcplot** este cea care creeaza diagrama. Aceasta primeste ca parametru lista de muchii. Mai jos s-a folosit setul de date Simpsons.
+
+```{r}
+data(Simpsons)
+iSimp <- asIgraph(Simpsons)
+simp_edge <- get.edgelist(iSimp)
+arcplot(simp_edge)
+```
+
+Diagrama poate fi personalizata in felul urmator: vom imparti datele in grupurile urmatoare: 1=familie, 2=munca, 3=scoala, 4=vacini, iar pentru fiecare categorie se vor folosi culori diferite.
+
+```{r}
+s_grp <- V(iSimp)$group
+s_col = c("#a6611a", "#dfc27d","#80cdc1","#018571")
+cols = s_col[s_grp]
+node_deg <- degree(iSimp)
+arcplot(simp_edge, lwd.arcs=2, cex.nodes=node_deg/2, labels=V(iSimp)$vertex.names, col.labels="darkgreen",font=1, pch.nodes=21,line=1,col.nodes = cols, bg.nodes = cols, show.nodes = TRUE)
+
+```
+
+### 6.2.2 Diagrame coarda
+
+Diagramele coarda sunt un fel special de reprezentare grafica circulara a datelor dintr-un tabel, in care se pune accentul pe afisarea relatiilor dintre date. Cum retelele se pot stoca si sub forma de tabel, acest tip de diagrama devine o varianta optima si pentru reprezentarea grafica a retelelor. Se recomanda folosirea lor in cazurile in care retelele prezinta informatie chiar pe muchii (weighted) si informatia respectiva este mai de interes decat alte informatii ale nodurilor.
+
+Pachetul **circlize** dispune de o multime de diagrame circulare, printre care si diagrama coarda. Vom folosi setul de date "2010 Netherlands World Cup soccer team", ca sa analizam numarul de pasari de minge intre membrii echipei.
+
+Pentru acest lucru, este necesar sa pregatim datele in prealabil. Vom stoca datele intr-o matrice de NxN, unde N e numarul de jucatori. Numele jucatorilor sunt notate atat pe linia de sus (0), cat si pe coloana din stanga (0), iar pe diagonala principala sunt numai 0 (un jucator nu poate sa isi paseze mingea lui insusi). Pentru a fi mai usor de interpretat diagrama, vom elimina muchiile cu mai putin de 10 pasari.
+
+
+```{r}
+library(statnet)
+library(circlize)
+data(FIFA_Nether)
+FIFAm <- as.sociomatrix(FIFA_Nether,attrname='passes')
+names <- c("GK1","DF3","DF4","DF5","MF6",
+"FW7","FW9","MF10","FW11","DF2","MF8")
+rownames(FIFAm) = names
+colnames(FIFAm) = names
+chordDiagram(FIFAm)
+
+```
+
+Uneori poate fi dificil de interpretat diagramele coarda, motiv pentru care se recomanda sa finisam diagrama. De aceea, pentru diagrama de mai jos, am impartit jucatorii in categorii desemnate de aceeasi culoare (Forward=albastru, Midfielder=verde, etc). De asemenea, am setat optiunea de bidirectional=true, pentru a se putea observa cu usurinta de la cine a venit mingea, si catre cine a plecat.
+
+```{r}
+data(FIFA_Nether)
+FIFAm <- as.sociomatrix(FIFA_Nether,attrname='passes')
+names <- c("GK1","DF3","DF4","DF5","MF6",
+"FW7","FW9","MF10","FW11","DF2","MF8")
+rownames(FIFAm) = names
+colnames(FIFAm) = names
+grid.col <- c("#AA3939",rep("#AA6C39",4), rep("#2D882D",3),rep("#226666",3))
+chordDiagram(FIFAm,directional = TRUE,
+grid.col = grid.col, order=c("GK1","DF2","DF3","DF4","DF5", "MF6","MF8","MF10","FW7", "FW9","FW11"))
+```
+
+
+### 6.2.3 Heatmaps
+
+Heatmap-urile sunt alt tip de diagrame potrivite pentru retelele cu informatie pe muchii (weighted). In cazul setului de date FIFA_Nether, aceasta diagrama ne ajuta pentru a determina care sunt jucatorii care au dat si care au primit cele mai multe pasari de minge.
+
+La fel ca in cazul diagramelor coarda, datele trebuie organizate sub forma unei matrici sociomatrix, care contine numarul de pasari de minge pentru fiecare jucator:
+
+```{r}
+data(FIFA_Nether)
+FIFAm <- as.sociomatrix(FIFA_Nether,attrname='passes')
+colnames(FIFAm) <- c("GK1","DF3","DF4","DF5", "MF6","FW7","FW9","MF10", "FW11","DF2","MF8")
+rownames(FIFAm) <- c("GK1","DF3","DF4","DF5", "MF6","FW7","FW9","MF10", "FW11","DF2","MF8")
+palf <- colorRampPalette(c("#822B66", "#003333"))
+heatmap(FIFAm[,11:1],Rowv = NA,Colv = NA,col = palf(60),
+scale="none", margins=c(11,11) )
+
+```
+
+In figura de mai sus, jucatorii de pe linii sunt cei care trimit mingea (passers), iar cei de pe coloana sunt cei care o primesc (receivers). Astfel, cea mai intunecata casuta este cea care desemneaza faptul ca GK1 a dat cele mai multe mingi catre DF4.
+
+## 6.3 Crearea de diagrame de retele cu alte pachete R
+
+### 6.3.1 Diagrame realizate cu ggplot2
+
+Desi acest pachet nu este cel mai potrivit pentru realizarea unei reprezentari complexe a unei retele, iata ce optiuni ofera: functia edgeMaker() este folosita pentru a crea grafice atractive folosing curba de intensitate conică.
+
+```{r}
+fifa <- FIFA_Nether
+
+edgeMaker <- function(whichRow,len=100, curved = TRUE){
+  fromC <- layoutCoordinates[adjacencyList[whichRow,1],]
+  toC <- layoutCoordinates[adjacencyList[whichRow,2],]
+  graphCenter <- colMeans(layoutCoordinates)
+  bezierMid <- c(fromC[1], toC[2])
+  distance1 <- sum((graphCenter - bezierMid)**2)
+if(distance1 < sum((graphCenter - c(toC[1], fromC[2]))**2)){
+  bezierMid <- c(toC[1], fromC[2])
+}
+bezierMid <- (fromC + toC + bezierMid) / 3
+if(curved == FALSE){
+  bezierMid <- (fromC + toC) / 2
+}
+edge <- data.frame(bezier(c(fromC[1], bezierMid[1], toC[1]), c(fromC[2], bezierMid[2], toC[2]), evaluation = len))
+edge$Sequence <- 1:len
+edge$Group <- paste(adjacencyList[whichRow, 1:2], collapse = ">")
+return(edge)
+}
+
+fifa <- FIFA_Nether
+fifa.edge <- as.edgelist.sna(fifa,attrname='passes')
+fifa.edge <- data.frame(fifa.edge)
+names(fifa.edge)[3] <- "value"
+fifa.edge <- fifa.edge[fifa.edge$value > 9,]
+adjacencyList <- fifa.edge
+
+```
+
+```{r}
+layoutCoordinates <- gplot(network(fifa.edge))
+allEdges <- lapply(1:nrow(fifa.edge),
+edgeMaker, len = 500, curved = TRUE)
+allEdges <- do.call(rbind, allEdges)
+```
+Înainte de a finaliza graficul, adaugam o noua temă ggplot.
+
+```{r}
+new_theme_empty <- theme_bw()
+new_theme_empty$line <- element_blank()
+new_theme_empty$rect <- element_blank()
+new_theme_empty$strip.text <- element_blank()
+new_theme_empty$axis.text <- element_blank()
+new_theme_empty$plot.title <- element_blank()
+new_theme_empty$axis.title <- element_blank()
+new_theme_empty$plot.margin <- structure(c(0,0,-1,-1),unit = "lines",valid.unit = 3L,class = "unit")
+```
+
+```{r}
+zp1 <- ggplot(allEdges)
+zp1 <- zp1 + geom_path(aes(x = x, y = y, group = Group,colour=Sequence, size=-Sequence))
+zp1 <- zp1 + geom_point(data = data.frame(layoutCoordinates),aes(x = x, y = y),size = 4, pch = 21,colour = "black", fill = "gray")
+zp1 <- zp1 + scale_colour_gradient(low = gray(0),high = gray(9/10),guide = "none")
+zp1 <- zp1 + scale_size(range = c(1/10, 1.5),guide = "none")
+zp1 <- zp1 + new_theme_empty
+print(zp1)
 ```
 
 # THANK YOU!
